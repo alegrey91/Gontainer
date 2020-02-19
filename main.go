@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.2"
+const version = "0.8.3"
 const shell = "/bin/sh"
 
 /*
@@ -76,14 +76,14 @@ Print help.
 */
 func help() {
 	fmt.Println("Usage: ./Gontainer -run -uid [-mnt=/path/rootfs] [-uts [-hostname=new_hostname]] [-ipc] [-net] [-pid]")
-	fmt.Println("  -mnt='/path/rootfs'	Enable Mount namespace")
-	fmt.Println("  -uts			Enable UTS namespace")
+	fmt.Println("  -mnt='/path/rootfs'		Enable Mount namespace")
+	fmt.Println("  -uts				Enable UTS namespace")
 	fmt.Println("  -hostname='new_hostname'	Set a custom hostname into the container")
-	fmt.Println("  -ipc			Enable IPC namespace")
-	fmt.Println("  -net			Enable Network namespace")
-	fmt.Println("  -pid			Enable PID namespace")
-	fmt.Println("  -uid			Enable User namespace")
-	fmt.Println("  -v			Check " + program_name + " version")
+	fmt.Println("  -ipc				Enable IPC namespace")
+	fmt.Println("  -net				Enable Network namespace")
+	fmt.Println("  -pid				Enable PID namespace")
+	fmt.Println("  -uid				Enable User namespace")
+	fmt.Println("  -v				Check " + program_name + " version")
 }
 
 func print_version(opt *Opts) {
