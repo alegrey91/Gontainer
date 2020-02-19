@@ -29,14 +29,15 @@ go build github.com/alegrey91/Gontainer
 Typing `Gontainer -h` the following output will be shown:
 
 ```
-Usage: ./Gontainer -run -uid [-mnt=/path/rootfs] [-uts [-hst=new_hostname]] [-ipc] [-net] [-pid]
+Usage: ./Gontainer -run -uid [-mnt=/path/rootfs] [-uts [-hostname=new_hostname]] [-ipc] [-net] [-pid]
   -mnt='/path/rootfs'   Enable Mount namespace
   -uts                  Enable UTS namespace
-  -hst='new_hostname'   Set a custom hostname into the container
+  -hostname='new_hostname'   Set a custom hostname into the container
   -ipc                  Enable IPC namespace
   -net                  Enable Network namespace
   -pid                  Enable PID namespace
   -uid                  Enable User namespace
+  -v					Check Gontainer version
 ```
 
 Below there is a full explanation of provided arguments:
@@ -106,3 +107,4 @@ As you can see, your OS file system has disappeared, leaving space for a new fil
 4. https://klotzandrew.com/blog/container-from-scratch
 5. https://www.infoq.com/articles/build-a-container-golang/
 6. https://en.wikipedia.org/wiki/Linux_namespaces
+
