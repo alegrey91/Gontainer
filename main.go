@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.1"
+const version = "0.8.2"
 const shell = "/bin/sh"
 
 /*
