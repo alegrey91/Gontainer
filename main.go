@@ -83,7 +83,7 @@ func help() {
 	fmt.Println("  -net			Enable Network namespace")
 	fmt.Println("  -pid			Enable PID namespace")
 	fmt.Println("  -uid			Enable User namespace")
-	fmt.Println("  -v			Check " + program_name + "version")
+	fmt.Println("  -v			Check " + program_name + " version")
 }
 
 func print_version(opt *Opts) {
