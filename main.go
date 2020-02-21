@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.3"
+const version = "0.8.4"
 const shell = "/bin/sh"
 
 /*
@@ -46,7 +46,7 @@ func main() {
 	flag.StringVar(&opt.hostname, "hostname", "", "")
 	flag.BoolVar(&opt.ipc, "ipc", false, "")
 	flag.BoolVar(&opt.network, "net", false, "")
-	flag.BoolVar(&opt.process_id, "process_id", false, "")
+	flag.BoolVar(&opt.process_id, "pid", false, "")
 	flag.BoolVar(&opt.user_id, "uid", false, "")
 	flag.BoolVar(&opt.run, "run", false, "")
 	flag.BoolVar(&opt.ns, "ns", false, "")
@@ -127,6 +127,12 @@ func opts_debug(opt *Opts) {
 		fmt.Println("• network: ", enabled)
 	} else {
 		fmt.Println("• network: ", disabled)
+	}
+
+	if opt.process_id != false {
+		fmt.Println("• pid: ", enabled)
+	} else {
+		fmt.Println("• pid: ", disabled)
 	}
 
 	if opt.user_id != false {
