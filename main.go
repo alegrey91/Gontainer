@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.4"
+const version = "0.8.5"
 const shell = "/bin/sh"
 
 /*
@@ -203,7 +203,7 @@ func run_with_ns(opt *Opts) {
 
 	cmd.Run()
 
-	unset_process_id(opt)
+	defer unset_process_id(opt)
 }
 
 /*
