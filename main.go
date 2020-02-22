@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.6"
+const version = "0.9.0"
 const shell = "/bin/sh"
 
 /*
@@ -102,10 +102,17 @@ func opts_debug(opt *Opts) {
 	disabled := "\033[1;31mdisabled\033[0m"
 
 	fmt.Println("[Gontainer config]")
+	//	if opt.mount != "" {
+	//		fmt.Printf("• mount:  \"%v\"\n", opt.mount)
+	//	} else {
+	//		fmt.Println("• mount:  \"\"")
+	//	}
+
 	if opt.mount != "" {
-		fmt.Printf("• mount:  \"%v\"\n", opt.mount)
+		fmt.Println("• mount: ", enabled)
+		fmt.Printf(" ↳ %s\n", opt.mount)
 	} else {
-		fmt.Println("• mount:  \"\"")
+		fmt.Println("• mount: ", disabled)
 	}
 
 	if opt.uts != false {
