@@ -12,7 +12,7 @@ import (
 Common constants.
 */
 const program_name = "Gontainer"
-const version = "0.8.5"
+const version = "0.8.6"
 const shell = "/bin/sh"
 
 /*
@@ -339,7 +339,7 @@ func set_process_id(opt *Opts) bool {
 		}
 	} else {
 		if opt.process_id != false {
-			fmt.Println("Error: option -process_id require -mount.")
+			fmt.Println("Error: option -pid require -mount.")
 		}
 		return false
 	}
