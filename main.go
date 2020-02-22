@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -64,10 +66,9 @@ func main() {
 	case "-ns":
 		run_with_ns(opt)
 	default:
-		//panic("Error!")
-		fmt.Println("Wrong arguments passed.")
 		help()
-		os.Exit(1)
+		fmt.Println()
+		log.Fatal("Wrong arguments passed.")
 	}
 }
 
@@ -102,11 +103,6 @@ func opts_debug(opt *Opts) {
 	disabled := "\033[1;31mdisabled\033[0m"
 
 	fmt.Println("[Gontainer config]")
-	//	if opt.mount != "" {
-	//		fmt.Printf("• mount:  \"%v\"\n", opt.mount)
-	//	} else {
-	//		fmt.Println("• mount:  \"\"")
-	//	}
 
 	if opt.mount != "" {
 		fmt.Println("• mount: ", enabled)
@@ -193,12 +189,13 @@ func run_with_ns(opt *Opts) {
 		Makes corresponding namespaces actions,
 		if flag was set
 	*/
-	set_mount(opt)
-	set_uts(opt)
-	set_ipc(opt)
-	set_network(opt)
-	set_process_id(opt)
-	set_user_id(opt)
+
+	must(set_mount(opt))
+	must(set_uts(opt))
+	must(set_ipc(opt))
+	must(set_network(opt))
+	must(set_process_id(opt))
+	must(set_user_id(opt))
 
 	//cmd := exec.Command(container_cmd(opt))
 	cmd := exec.Command(shell)
@@ -210,7 +207,7 @@ func run_with_ns(opt *Opts) {
 
 	cmd.Run()
 
-	defer unset_process_id(opt)
+	defer must(unset_process_id(opt))
 }
 
 /*
@@ -262,20 +259,20 @@ Set MNT namespace environment, checking
 Specifically, it chroot the rootfs passed
 by cli (with -hostname flag).
 */
-func set_mount(opt *Opts) bool {
-	if _, err := os.Stat(opt.mount); !os.IsNotExist(err) {
-		if err := syscall.Chroot(opt.mount); err != nil {
-			fmt.Println("Error setting MNT namespace.")
-			os.Exit(1)
+func set_mount(opt *Opts) (bool, error) {
+	if opt.mount != "" {
+		if _, err := os.Stat(opt.mount); !os.IsNotExist(err) {
+			if err := syscall.Chroot(opt.mount); err != nil {
+				return false, errors.New("Error setting MNT namespace.")
+			}
+			if err := syscall.Chdir("/"); err != nil {
+				return false, errors.New("Error changing dir.")
+			}
+		} else {
+			return false, errors.New("Error setting MNT namespace.")
 		}
-		if err := syscall.Chdir("/"); err != nil {
-			fmt.Println("Error during change dir.")
-			os.Exit(1)
-		}
-	} else {
-		return false
 	}
-	return true
+	return true, nil
 }
 
 /*
@@ -285,7 +282,7 @@ Specifically set the provided hostname passed
 by cli (with -hostname flag), otherwise set the
 default hostname of the program.
 */
-func set_uts(opt *Opts) bool {
+func set_uts(opt *Opts) (bool, error) {
 	var hostname string
 	if opt.uts != false {
 		if opt.hostname != "" {
@@ -294,36 +291,26 @@ func set_uts(opt *Opts) bool {
 			hostname = program_name
 		}
 		if err := syscall.Sethostname([]byte(hostname)); err != nil {
-			fmt.Println("Error setting UTS namespace.")
-			os.Exit(1)
-			//panic(err)
+			return false, errors.New("Error setting UTS namespace.")
 		}
-	} else {
-		return false
 	}
-	return true
+	return true, nil
 }
 
 /* TODO
 Set IPC namespace environment, checking
 'opt' struct to retrieve passed arguments.
 */
-func set_ipc(opt *Opts) bool {
-	if opt.ipc == false {
-		return false
-	}
-	return true
+func set_ipc(opt *Opts) (bool, error) {
+	return true, nil
 }
 
 /* TODO
 Set NET namespace environment, checking
 'opt' struct to retrieve passed arguments.
 */
-func set_network(opt *Opts) bool {
-	if opt.network == false {
-		return false
-	}
-	return true
+func set_network(opt *Opts) (bool, error) {
+	return true, nil
 }
 
 /*
@@ -331,44 +318,35 @@ Set PID namespace environment, checking
 'opt' struct to retrieve passed arguments.
 Specifically, it mount the 'proc' fs.
 */
-func set_process_id(opt *Opts) bool {
+func set_process_id(opt *Opts) (bool, error) {
 	// Check if option mount was set, if not, return false
 	if opt.mount != "" {
 		if opt.process_id != false {
 			if err := syscall.Mount("proc", "proc", "proc", 0, ""); err != nil {
-				fmt.Println("Error setting PID namespace.")
-				os.Exit(1)
+				return false, errors.New("Error setting PID namespace.")
 			}
-			//			if err := syscall.Mount("dev", "/dev", "devtmpfs", 0, ""); err != nil {
-			//				fmt.Println("Error setting PID namespace.")
-			//				os.Exit(1)
-			//			}
 		}
 	} else {
 		if opt.process_id != false {
-			fmt.Println("Error: option -pid require -mount.")
+			return false, errors.New("Error: option -pid require -mount.")
 		}
-		return false
 	}
-	return true
+	return true, nil
 }
 
 /*
 Unset process_id namespace environment.
 Umount /proc from filesystem.
 */
-func unset_process_id(opt *Opts) bool {
+func unset_process_id(opt *Opts) (bool, error) {
 	if opt.mount != "" {
 		if opt.process_id != false {
 			if err := syscall.Unmount("/proc", 0); err != nil {
-				fmt.Println("Error unsetting PID namespace.")
-				os.Exit(1)
+				return false, errors.New("Error unsetting PID namespace.")
 			}
 		}
-	} else {
-		return false
 	}
-	return true
+	return true, nil
 }
 
 /* TODO
@@ -377,9 +355,15 @@ Set UID namespace environment, checking
 Specifically, it map your user_id/gid, with the
 container user_id/gid.
 */
-func set_user_id(opt *Opts) bool {
-	if opt.user_id == false {
-		return false
+func set_user_id(opt *Opts) (bool, error) {
+	return true, nil
+}
+
+/*
+Function to check namespacese have been set correctly.
+*/
+func must(res bool, err error) {
+	if res != true && err != nil {
+		log.Fatal(err)
 	}
-	return true
 }
