@@ -14,7 +14,7 @@ import (
 Common constants.
 */
 const programName = "Gontainer"
-const version = "0.9.0"
+const version = "0.9.1"
 const shell = "/bin/sh"
 
 /*
